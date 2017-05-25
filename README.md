@@ -56,7 +56,7 @@ Possible events: loadstart, loadstop, exit
 ```
 ### executeScript
 ```js
-	browser.executeScript(scriptString)
+	browser.executeScript(scriptString, function(data) {});
 ```
 Removes the eventlistener for an event.
 
