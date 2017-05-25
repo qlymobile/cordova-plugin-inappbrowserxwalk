@@ -231,16 +231,10 @@ public class InAppBrowserXwalk extends CordovaPlugin {
                 xWalkWebView.evaluateJavascript(finalScriptToInject, new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String scriptResult) {
-                        try {
-                            JSONObject obj = new JSONObject();
-                            obj.put("type", "jsCallback");
-                            obj.put("result", scriptResult);
-                            Log.d(LOG_TAG, "Inject JS result: " + scriptResult);
-                            PluginResult result = new PluginResult(PluginResult.Status.OK, obj);
-                            result.setKeepCallback(true);
-                            callbackContext.sendPluginResult(result);
-                        } catch (JSONException ex) {
-                        }
+                        Log.d(LOG_TAG, "Inject JS result: " + scriptResult);
+                        PluginResult result = new PluginResult(PluginResult.Status.OK, scriptResult);
+                        result.setKeepCallback(true);
+                        callbackContext.sendPluginResult(result);
                     }
                 });
             }

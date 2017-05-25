@@ -54,6 +54,10 @@ Possible events: loadstart, loadstop, exit
 ```js
 	browser.removeEventListener(eventname)
 ```
+### executeScript
+```js
+	browser.executeScript(scriptString)
+```
 Removes the eventlistener for an event.
 
 
@@ -74,6 +78,7 @@ Removes the eventlistener for an event.
 
 		browser.addEventListener("loadstart", function ( url ) {
             console.log(url);
+            browser.executeScript('window', function(data) {})
         });
 
         browser.addEventListener("loadstop", function ( url ) {
@@ -83,6 +88,7 @@ Removes the eventlistener for an event.
         browser.addEventListener("exit", function () {
             console.log("browser closed");
         });
+
 	}
 	else {
 		window.open("http://shoety.de", "_blank");
