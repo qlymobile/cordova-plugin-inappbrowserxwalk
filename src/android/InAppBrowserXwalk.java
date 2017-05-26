@@ -3,6 +3,7 @@ package com.example.plugin.InAppBrowserXwalk;
 import com.example.plugin.InAppBrowserXwalk.BrowserDialog;
 
 import android.content.res.Resources;
+
 import org.apache.cordova.*;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
@@ -11,11 +12,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import org.json.JSONStringer;
 import org.xwalk.core.XWalkView;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.internal.XWalkViewInternal;
 import org.xwalk.core.XWalkCookieManager;
 
+import android.util.JsonReader;
 import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
@@ -61,7 +64,7 @@ public class InAppBrowserXwalk extends CordovaPlugin {
         }
 
         if (action.equals("injectScriptCode")) {
-            this.injectJS(data.getString(0));
+            this.injectJS(data.getString(0), callbackContext);
         }
 
         return true;
@@ -222,8 +225,15 @@ public class InAppBrowserXwalk extends CordovaPlugin {
         });
     }
 
-    public void injectJS(String source) {
-        final String finalScriptToInject = source;
+    public void injectJS(final String source, CallbackContext callbackContext) {
+        final CallbackContext cbContext = callbackContext;
+        String jsWrapper = "(function(){return [eval(%s)];})()";
+        JSONArray jsonEsc = new org.json.JSONArray();
+        jsonEsc.put(source);
+        String jsonRepr = jsonEsc.toString();
+        String jsonSourceString = jsonRepr.substring(1, jsonRepr.length() - 1);
+        final String finalScriptToInject = String.format(jsWrapper, jsonSourceString);
+
         Log.d(LOG_TAG, "Inject JS: " + finalScriptToInject);
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -232,9 +242,15 @@ public class InAppBrowserXwalk extends CordovaPlugin {
                     @Override
                     public void onReceiveValue(String scriptResult) {
                         Log.d(LOG_TAG, "Inject JS result: " + scriptResult);
-                        PluginResult result = new PluginResult(PluginResult.Status.OK, scriptResult);
+                        PluginResult result;
+                        try {
+                            JSONArray jsonArray = new JSONArray(scriptResult);
+                            result = new PluginResult(PluginResult.Status.OK, jsonArray);
+                        } catch (JSONException e) {
+                            result = new PluginResult(PluginResult.Status.OK, scriptResult);
+                        }
                         result.setKeepCallback(true);
-                        callbackContext.sendPluginResult(result);
+                        cbContext.sendPluginResult(result);
                     }
                 });
             }
