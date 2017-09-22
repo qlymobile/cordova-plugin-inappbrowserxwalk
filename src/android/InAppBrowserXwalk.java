@@ -170,7 +170,7 @@ public class InAppBrowserXwalk extends CordovaPlugin {
                     }
                 });
 
-                main.addView(toolbar);
+                //main.addView(toolbar);
                 main.addView(xWalkWebView);
 
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
